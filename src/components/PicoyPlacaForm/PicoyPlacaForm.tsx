@@ -1,10 +1,31 @@
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import { daysOfWeek, validationSchema } from "./PicoyPlacaForm.helper";
+import {
+  daysOfWeek,
+  isLastDigitInPicoyPlacaDay,
+  isTimeBetweenPicoyPlacaHours,
+  validationSchema,
+} from "./PicoyPlacaForm.helper";
 import classes from "./PicoyPlacaForm.module.css";
-
+import { PicoyPlacaFormData } from "./PicoyPlacaForm.types";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 const PicoyPlacaForm = () => {
- 
+  const predictPicoyPlaca = (formData: PicoyPlacaFormData) => {
+    const { licensePlate, day, hour } = formData;
+    dayjs.extend(customParseFormat);
+    if (day === daysOfWeek[5] || day === daysOfWeek[6]) {
+      return;
+    }
+    const formattedHour = dayjs(hour, "HH:mm");
+    if (!isTimeBetweenPicoyPlacaHours(formattedHour)) {
+      return;
+    }
+    const lastDigit = parseInt(licensePlate.charAt(licensePlate.length - 1));
+    if (isLastDigitInPicoyPlacaDay(lastDigit, day)) {
+      return;
+    }
+  };
   return (
     <Formik
       initialValues={{
@@ -14,7 +35,8 @@ const PicoyPlacaForm = () => {
       }}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
-        console.log("logging values!", values);
+        console.log("logging balues!", values);
+        predictPicoyPlaca(values);
       }}
     >
       <Form className={classes.form}>
