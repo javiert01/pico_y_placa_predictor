@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import * as Yup from "yup";
 import isBetween from "dayjs/plugin/isBetween";
+
 export const daysOfWeek = [
   "Monday",
   "Tuesday",
@@ -14,10 +15,12 @@ export const daysOfWeek = [
 export const validationSchema = () => {
   return Yup.object({
     licensePlate: Yup.string()
-      .max(7, "Must be 7 characters or less")
-      .required("Required"),
-    day: Yup.string().required("Required"),
-    hour: Yup.string().required("Required"),
+      .min(5, "The input must be at least 5 characters long!")
+      .max(7, "The input must be 7 characters or less")
+      .matches(/^[a-zA-Z]{2,3}[0-9]{3,4}$/, "The license plate must start with 2 or 3 letters, followed by 3 or 4 numbers!")
+      .required("This field is required!"),
+    day: Yup.string().required("This field is required!"),
+    hour: Yup.string().required("This field is required!"),
   });
 };
 
